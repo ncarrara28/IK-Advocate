@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IEP Pal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d14;--surface:#13151f;--surface2:#1a1d2b;--border:#252837;--border2:#2e3347;
+  --text:#e8eaef;--text2:#9ca3b0;--text3:#525870;
+  --blue:#5b7fff;--blue2:#3d5ce8;
+  --purple:#9b7dff;--purple2:#7c5ce8;
+  --teal:#22d3ee;--teal2:#0891b2;
+  --green:#4ade80;--green2:#16a34a;
+  --amber:#fbbf24;--amber2:#d97706;
+  --red:#f87171;--red2:#dc2626;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:1.25rem}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-title{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.hdr-title span{color:var(--purple)}
+.hdr-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* PHI BANNER */
+.phi-banner{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:9px 16px;margin-bottom:1.25rem;font-size:12px;color:var(--amber);display:flex;align-items:center;gap:10px}
+
+/* LAYOUT */
+.main-grid{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.card.c-purple::before{background:linear-gradient(90deg,var(--purple2),var(--purple))}
+.card.c-teal::before{background:linear-gradient(90deg,var(--teal2),var(--teal))}
+.card.c-amber::before{background:linear-gradient(90deg,var(--amber2),var(--amber))}
+.card.c-green::before{background:linear-gradient(90deg,var(--green2),var(--green))}
+.card-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap}
+.card-title{font-size:13px;font-weight:600;color:#fff}
+.card-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+
+/* BUTTONS */
+.btn{padding:7px 14px;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.btn-p{background:linear-gradient(135deg,var(--purple2),var(--purple));color:#fff}
+.btn-p:hover{opacity:.88}
+.btn-p:disabled{opacity:.45;cursor:not-allowed}
+.btn-g{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-g:hover{border-color:var(--purple);color:var(--purple)}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
+
+/* INPUTS */
+.inp{font-size:12px;border:1px solid var(--border2);border-radius:8px;padding:8px 11px;background:var(--bg);color:var(--text);outline:none;width:100%;font-family:inherit}
+.inp:focus{border-color:var(--purple)}
+.inp::placeholder{color:var(--text3)}
+.sel{font-size:12px;border:1px solid var(--border2);border-radius:8px;padding:8px 11px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;cursor:pointer}
+.sel:focus{border-color:var(--purple)}
+
+/* TAGS */
+.tag{font-size:10px;padding:2px 8px;border-radius:7px;font-weight:600;display:inline-block;white-space:nowrap}
+.tg{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.ta{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.tr{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.tb{background:rgba(91,127,255,.12);color:var(--blue);border:1px solid rgba(91,127,255,.2)}
+.tp{background:rgba(155,125,255,.12);color:var(--purple);border:1px solid rgba(155,125,255,.2)}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
+.chat-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--purple2),var(--purple),var(--teal))}
+
+.session-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap}
+.session-name{font-size:12px;font-weight:600;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.messages{height:480px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.msg{max-width:86%;padding:11px 15px;border-radius:14px;font-size:13px;line-height:1.65;word-break:break-word}
+.msg.user{align-self:flex-end;background:rgba(155,125,255,.14);border:1px solid rgba(155,125,255,.28);color:var(--text)}
+.msg.asst{align-self:flex-start;background:var(--surface2);border:1px solid var(--border2);color:var(--text)}
+.msg-actions{display:flex;gap:6px;margin-top:10px}
+.thinking{align-self:flex-start;padding:10px 15px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;font-size:12px;color:var(--text3);font-style:italic}
+.thinking span{display:inline-block;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+.input-row{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
+.chat-textarea{flex:1;font-size:13px;border:1px solid var(--border2);border-radius:9px;padding:10px 13px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;resize:none;line-height:1.5;min-height:60px;max-height:140px}
+.chat-textarea:focus{border-color:var(--purple)}
+.chat-textarea::placeholder{color:var(--text3)}
+
+.empty-chat{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty-chat .icon{font-size:36px;margin-bottom:14px}
+.empty-chat .title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.empty-chat .hint{font-size:12px;line-height:1.75;max-width:380px;margin:0 auto}
+
+/* TOOLS STACK */
+.tools-stack{display:flex;flex-direction:column;gap:12px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.tool-card.tc-purple::before{background:linear-gradient(90deg,var(--purple2),var(--purple))}
+.tool-card.tc-teal::before{background:linear-gradient(90deg,var(--teal2),var(--teal))}
+.tool-card.tc-amber::before{background:linear-gradient(90deg,var(--amber2),var(--amber))}
+
+/* TIMELINE RESULT */
+.tl-result{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:10px;display:none}
+.tl-result.show{display:block}
+.tl-row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);gap:8px;font-size:11px}
+.tl-row:last-child{border-bottom:none}
+
+/* TEMPLATE BUTTONS */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tpl-btn{font-size:11px;padding:8px 10px;border:1px solid var(--border2);border-radius:8px;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;line-height:1.35}
+.tpl-btn:hover{border-color:var(--purple);color:var(--purple);background:rgba(155,125,255,.07)}
+.tpl-btn:active{transform:scale(.98)}
+
+/* LEGAL REFERENCE */
+.ref-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
+.ref-row:last-child{border-bottom:none;padding-bottom:0}
+.ref-days{font-weight:700;min-width:96px;flex-shrink:0}
+.ref-cite{font-size:9px;color:var(--text3);margin-top:2px}
+.ref-desc{color:var(--text2);flex:1}
+
+/* HISTORY / DOCS LIST */
+.list-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .12s}
+.list-row:last-child{border-bottom:none}
+.list-row:hover{background:rgba(155,125,255,.05)}
+.list-name{font-size:12px;color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list-meta{font-size:10px;color:var(--text3);white-space:nowrap}
+.empty-list{font-size:12px;color:var(--text3);padding:8px 0}
+
+/* VLOG */
+.vlog-form{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;display:none}
+.vlog-form.open{display:block}
+.vlog-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.vlog-row:last-child{border-bottom:none}
+
+/* MODAL OVERLAY */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:900;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:540px;max-width:92vw;max-height:82vh;display:flex;flex-direction:column}
+.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-size:14px;font-weight:700;color:#fff}
+.modal-body{overflow-y:auto;padding:10px 20px;flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div>
+        <div class="hdr-title">IEP <span>Pal</span></div>
+        <div class="hdr-sub">NJ Special Education Advocacy Reference · Interactive Kids</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button class="btn btn-g btn-xs" onclick="showHistory()" id="hist-btn" style="display:none">Session history</button>
+      <button class="btn btn-g btn-xs" onclick="saveSession()" id="save-btn" style="display:none">Save session</button>
+      <button class="btn btn-g btn-xs" onclick="newSession()">+ New chat</button>
+    </div>
+  </div>
+
+  <!-- PHI DISCLAIMER -->
+  <div class="phi-banner">
+    <span style="font-size:16px;flex-shrink:0">⚠️</span>
+    <span><strong>General advocacy reference only.</strong> Do not enter student names, dates of birth, or other identifying information into this tool.</span>
+  </div>
+
+  <!-- MAIN: CHAT + TOOLS -->
+  <div class="main-grid">
+
+    <!-- CHAT -->
+    <div class="chat-wrap">
+      <div class="session-bar">
+        <span class="session-name" id="session-label">New session</span>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="input-row">
+        <textarea class="chat-textarea" id="chat-input"
+          placeholder="Ask about IEP rights, procedural violations, FAPE, FBA/BIP standards, LRE, evaluation timelines…"
+          onkeydown="onKey(event)"></textarea>
+        <button class="btn btn-p" id="send-btn" onclick="sendMsg()" style="align-self:flex-end;flex-shrink:0">Send</button>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="tools-stack">
+
+      <!-- TIMELINE CALCULATOR -->
+      <div class="tool-card tc-purple">
+        <div class="section-title">IEP Timeline Calculator</div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">IEP Meeting Date</div>
+          <input type="date" class="inp" id="tl-meet" style="font-size:12px;padding:7px 10px"/>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">IEP Received Date <span style="font-weight:400;color:var(--text3)">(if received)</span></div>
+          <input type="date" class="inp" id="tl-recv" style="font-size:12px;padding:7px 10px"/>
+        </div>
+        <button class="btn btn-p" style="width:100%;font-size:12px" onclick="calcTimeline()">Calculate Deadlines</button>
+        <div class="tl-result" id="tl-out"></div>
+      </div>
+
+      <!-- DOCUMENT TEMPLATES -->
+      <div class="tool-card tc-teal">
+        <div class="section-title">Document Templates</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Generates a complete letter with legal citations in the chat.</div>
+        <div class="tpl-grid" id="tpl-grid"></div>
+      </div>
+
+      <!-- NJ LEGAL REFERENCE -->
+      <div class="tool-card tc-amber">
+        <div class="section-title">NJ Legal Quick Reference</div>
+        <div id="ref-grid"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM: SAVED DOCS + ADVOCACY LOG -->
+  <div class="bottom-grid">
+
+    <!-- SAVED DOCUMENTS -->
+    <div class="card c-purple">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">Saved Documents</div>
+          <div class="card-sub">Generated templates — use Print to export as PDF</div>
+        </div>
+      </div>
+      <div id="docs-list"></div>
+    </div>
+
+    <!-- ADVOCACY LOG -->
+    <div class="card c-amber">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">Advocacy Log</div>
+          <div class="card-sub">Generic issue tracking — no PHI</div>
+        </div>
+        <button class="btn btn-g btn-xs" onclick="toggleVlogForm()">+ Add issue</button>
+      </div>
+      <div class="vlog-form" id="vlog-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">District (generic)</div>
+            <input type="text" class="inp" id="vl-dist" placeholder="District A" style="font-size:12px;padding:7px 10px"/>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Issue Type</div>
+            <select class="sel inp" id="vl-type" style="font-size:12px;padding:7px 10px;width:100%">
+              <option value="">Select…</option>
+              <option>IEP Delay (15-day)</option>
+              <option>Predetermination</option>
+              <option>FBA Not Completed</option>
+              <option>PWN Violation</option>
+              <option>Records Request Delay</option>
+              <option>LRE Violation</option>
+              <option>Evaluation Timeline</option>
+              <option>Parent Participation Denied</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Notes (no PHI)</div>
+          <input type="text" class="inp" id="vl-notes" placeholder="Generic description…" style="font-size:12px;padding:7px 10px"/>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" class="inp" id="vl-date" style="font-size:12px;padding:7px 10px;width:auto"/>
+          <select class="sel" id="vl-status" style="font-size:12px;padding:7px 10px">
+            <option value="open">Open</option>
+            <option value="resolved">Resolved</option>
+            <option value="escalated">Escalated</option>
+          </select>
+          <button class="btn btn-p btn-xs" onclick="addViolation()">Add</button>
+          <button class="btn btn-g btn-xs" onclick="toggleVlogForm()">Cancel</button>
+        </div>
+      </div>
+      <div id="vlog-list"></div>
+    </div>
+
+  </div>
+</div><!-- /wrap -->
+
+<script>
+/* ══ CONSTANTS ══ */
+const STORAGE_KEY = 'iep_pal_v1';
+
+const SYSTEM_PROMPT = `You are an expert NJ Special Education Advocate with deep knowledge of federal and NJ state special education law. You are advising a BCBA and Clinical Director — speak at a professional level.
+
+FEDERAL LAW: IDEA (34 CFR Part 300), FERPA (20 U.S.C. §1232g), Section 504, ADA.
+NJ STATE LAW: N.J.A.C. 6A:14 (Special Education), N.J.A.C. 6A:32-7 (Student Records).
+
+KEY TIMELINES:
+- 15 calendar days: District sends IEP after meeting (N.J.A.C. 6A:14-3.7(e))
+- 15 calendar days: Parent review window after IEP receipt
+- 20 calendar days: District responds to referral with evaluation plan
+- 90 calendar days: Complete NJ evaluation process from referral
+- 60 calendar days: Federal IDEA evaluation baseline
+- 45 days: FERPA records request response
+- 3 years: Maximum between re-evaluations (triennial)
+
+KEY CONCEPTS: FAPE, LRE and continuum of placements, Prior Written Notice (PWN), predetermination violations, FBA/BIP requirements, IEE rights, ESY requirements, Child Find, Preschool Disabilities classification and kindergarten transition reclassification, VBMAPP, deviancy training research (Dishion, McCord & Poulin), NJ one-party consent for recordings, NJ DOE state complaint process, OCR complaints, SEPAG, due process.
+
+CLINICAL BACKGROUND: You also have BCBA expertise — interpret behavioral data, evaluate FBA adequacy, assess BIP treatment integrity, recommend behavioral supports for inclusion settings, identify when restrictive placements are clinically contraindicated.
+
+CORE LEGAL PRINCIPLES:
+- LRE is the legal default — restriction requires individual justification with data
+- District policy cannot override IDEA or individualized IEP determinations
+- Classification does not dictate evaluation scope
+- Placement must follow the IEP, not available placements
+- Completed FBA required before behavior-based placement decisions
+- Parent participation in the IEP meeting is the legally protected event — not the signature
+- Predetermination is illegal under IDEA
+- NJ is a one-party consent state for recordings
+
+DOCUMENT GENERATION: When asked to generate documents, produce complete professional templates with [BRACKET PLACEHOLDERS] for specific details. Include all relevant legal citations. Available templates: FERPA records request, IEP continuation request, IEE request, Prior Written Notice request, IEP delay follow-up, FBA request, state complaint letter.
+
+Be direct, precise, and action-oriented. Always note that formal legal proceedings require a licensed NJ attorney. Do not ask for or encourage entry of student names or identifying information.`;
+
+const NJ_TIMELINES = [
+  {days:'15 calendar days',desc:'District sends IEP after meeting',cite:'N.J.A.C. 6A:14-3.7(e)',sev:'high'},
+  {days:'15 calendar days',desc:'Parent review window after IEP receipt',cite:'N.J.A.C. 6A:14-3.7(e)',sev:'high'},
+  {days:'20 calendar days',desc:'District responds to referral with eval plan',cite:'N.J.A.C. 6A:14-3.4',sev:'high'},
+  {days:'90 calendar days',desc:'Complete evaluation from referral (NJ)',cite:'N.J.A.C. 6A:14-3.4',sev:'medium'},
+  {days:'60 calendar days',desc:'Complete evaluation from consent (Federal)',cite:'34 CFR §300.301',sev:'medium'},
+  {days:'45 calendar days',desc:'FERPA records request fulfillment',cite:'FERPA 20 U.S.C. §1232g',sev:'medium'},
+  {days:'3 years',desc:'Maximum between re-evaluations',cite:'34 CFR §300.303',sev:'low'},
+];
+
+const TEMPLATES = [
+  {label:'FERPA Records Request',key:'ferpa',
+   prompt:'Generate a complete professional FERPA records request letter template for a parent requesting copies of education records including any audio/video recording of an IEP meeting. Include all legal citations and bracket placeholders.'},
+  {label:'IEP Delay Follow-Up',key:'iep_delay',
+   prompt:'Generate a professional but firm follow-up email for a parent whose IEP has not been received within 15 calendar days of the meeting. Reference N.J.A.C. 6A:14-3.7(e) and note the procedural violation without being inflammatory. Include bracket placeholders.'},
+  {label:'Meeting Continuation',key:'continuation',
+   prompt:'Generate a professional email for a parent requesting a continuation of an IEP meeting, stating they need more time to review materials and consult with their advocate before finalizing decisions. Include bracket placeholders.'},
+  {label:'IEE Request',key:'iee',
+   prompt:"Generate a complete IEE request letter citing parent rights under IDEA 34 CFR 300.502, requesting the district fund an independent evaluation because the parent disagrees with the district's evaluation. Include bracket placeholders and key legal language."},
+  {label:'Prior Written Notice',key:'pwn',
+   prompt:'Generate a professional letter requesting Prior Written Notice regarding a proposed or enacted placement change, citing 34 CFR 300.503 and N.J.A.C. 6A:14-2.3. Include bracket placeholders.'},
+  {label:'FBA Request',key:'fba',
+   prompt:'Generate a formal written request for a Functional Behavior Assessment citing IDEA requirements, noting that a behavior-based placement recommendation cannot be made without adequate functional assessment data. Include bracket placeholders and legal citations.'},
+];
+
+/* ══ STATE ══ */
+let msgs = [];
+let sessions = [];
+let docs = [];
+let violations = [];
+let sending = false;
+let pendingTplKey = null;
+
+/* ══ PERSISTENCE ══ */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const p = JSON.parse(raw); sessions=p.sessions||[]; docs=p.docs||[]; violations=p.violations||[]; }
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({sessions,docs,violations})); } catch(e) {}
+}
+
+/* ══ UTILS ══ */
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(s) { return esc(s).replace(/\n/g,'<br>'); }
+function fmtDate(d) { return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+/* ══ RENDER: MESSAGES ══ */
+function renderMsgs() {
+  const el = document.getElementById('messages');
+  if (!el) return;
+  if (!msgs.length) {
+    el.innerHTML = `<div class="empty-chat">
+      <div class="icon">⚖️</div>
+      <div class="title">IEP Pal</div>
+      <div class="hint">Ask about IEP rights, procedural violations, FAPE requirements, FBA/BIP standards, LRE, evaluation timelines — or click a template in the tools panel to generate a professional document.</div>
+    </div>`;
+  } else {
+    el.innerHTML = msgs.map((m, i) => {
+      const isA = m.role === 'assistant';
+      const saveBtn = isA && m._tplKey
+        ? `<div class="msg-actions"><button class="btn btn-g btn-xs" onclick="saveDoc(${i})">Save this document</button></div>`
+        : '';
+      return `<div class="msg ${isA?'asst':'user'}">${fmt(m.content)}${saveBtn}</div>`;
+    }).join('');
+  }
+  el.scrollTop = el.scrollHeight;
+  // show/hide header buttons
+  document.getElementById('save-btn').style.display = msgs.length ? '' : 'none';
+  document.getElementById('hist-btn').style.display = sessions.length ? '' : 'none';
+}
+
+/* ══ RENDER: DOCS LIST ══ */
+function renderDocs() {
+  const el = document.getElementById('docs-list');
+  if (!el) return;
+  if (!docs.length) { el.innerHTML = '<div class="empty-list">No saved documents yet. Generate a template and click "Save this document".</div>'; return; }
+  el.innerHTML = docs.slice().reverse().map(d => `
+    <div class="list-row">
+      <div style="flex:1;min-width:0">
+        <div class="list-name">${esc(d.label)}</div>
+        <div class="list-meta">${d.date}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="btn btn-g btn-xs" onclick="printDoc('${d.id}')">Print / PDF</button>
+        <button class="btn btn-g btn-xs" onclick="deleteDoc('${d.id}')" style="color:var(--red)">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ══ RENDER: VIOLATION LOG ══ */
+function renderVlog() {
+  const el = document.getElementById('vlog-list');
+  if (!el) return;
+  if (!violations.length) { el.innerHTML = '<div class="empty-list">No issues logged yet.</div>'; return; }
+  const sc = {open:'var(--amber)',resolved:'var(--green)',escalated:'var(--red)'};
+  el.innerHTML = violations.slice().reverse().map(v => `
+    <div class="vlog-row">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:600;color:#fff">${esc(v.district)}</span>
+          <span class="tag tp">${esc(v.type)}</span>
+          <span style="font-size:10px;font-weight:600;color:${sc[v.status]||'var(--text3)'};text-transform:uppercase">${v.status}</span>
+        </div>
+        ${v.notes ? `<div style="font-size:11px;color:var(--text2);margin-bottom:2px">${esc(v.notes)}</div>` : ''}
+        <div style="font-size:10px;color:var(--text3)">${v.date}</div>
+      </div>
+      <button class="btn btn-g btn-xs" onclick="deleteViolation('${v.id}')" style="color:var(--red);flex-shrink:0;margin-left:8px">✕</button>
+    </div>`).join('');
+}
+
+/* ══ RENDER: STATIC PANELS ══ */
+function renderTemplates() {
+  document.getElementById('tpl-grid').innerHTML =
+    TEMPLATES.map(t => `<button class="tpl-btn" onclick="sendTemplate('${t.key}')">${t.label}</button>`).join('');
+}
+
+function renderReference() {
+  const svc = {high:'var(--red)',medium:'var(--amber)',low:'var(--green)'};
+  document.getElementById('ref-grid').innerHTML = NJ_TIMELINES.map(t => `
+    <div class="ref-row">
+      <div style="min-width:0;flex-shrink:0;width:96px">
+        <div class="ref-days" style="color:${svc[t.sev]}">${t.days}</div>
+        <div class="ref-cite">${t.cite}</div>
+      </div>
+      <div class="ref-desc">${t.desc}</div>
+    </div>`).join('');
+}
+
+/* ══ SEND MESSAGE ══ */
+function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+
+async function sendMsg() {
+  if (sending) return;
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  msgs.push({role:'user', content:text});
+  inp.value = '';
+  sending = true;
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true; btn.textContent = '…';
+
+  renderMsgs();
+
+  // Append thinking indicator without full re-render
+  const msgEl = document.getElementById('messages');
+  if (msgEl) {
+    const t = document.createElement('div');
+    t.className = 'thinking'; t.id = 'thinking-indicator';
+    t.innerHTML = 'Thinking<span>…</span>';
+    msgEl.appendChild(t);
+    msgEl.scrollTop = msgEl.scrollHeight;
+  }
+
+  try {
+    const apiMsgs = msgs.map(m => ({role:m.role, content:m.content}));
+    const resp = await fetch('/api/advocate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({messages:apiMsgs, system:SYSTEM_PROMPT})
+    });
+    if (!resp.ok) {
+      const e = await resp.json().catch(() => ({}));
+      throw new Error(e.error || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    const content = data.content?.[0]?.text || 'No response received.';
+    const msgObj = {role:'assistant', content};
+    if (pendingTplKey) {
+      msgObj._tplKey = pendingTplKey;
+      msgObj._tplLabel = TEMPLATES.find(t => t.key === pendingTplKey)?.label || 'Document';
+      pendingTplKey = null;
+    }
+    msgs.push(msgObj);
+  } catch(err) {
+    pendingTplKey = null;
+    msgs.push({role:'assistant', content:`⚠️ Could not reach the advocacy assistant: ${err.message}\n\nPlease verify the Azure Function is deployed and ANTHROPIC_API_KEY is set in Azure App Settings.`});
+  }
+
+  sending = false;
+  document.getElementById('thinking-indicator')?.remove();
+  btn.disabled = false; btn.textContent = 'Send';
+  renderMsgs();
+}
+
+/* ══ TEMPLATES ══ */
+function sendTemplate(key) {
+  const tpl = TEMPLATES.find(t => t.key === key);
+  if (!tpl) return;
+  pendingTplKey = key;
+  document.getElementById('chat-input').value = tpl.prompt;
+  sendMsg();
+}
+
+/* ══ TIMELINE CALCULATOR ══ */
+function calcTimeline() {
+  const meetStr = document.getElementById('tl-meet').value;
+  const recvStr = document.getElementById('tl-recv').value;
+  const out = document.getElementById('tl-out');
+
+  if (!meetStr) {
+    out.innerHTML = '<div style="color:var(--red);font-size:11px">Please enter the IEP meeting date.</div>';
+    out.classList.add('show'); return;
+  }
+
+  const meeting = new Date(meetStr + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const iepDue = new Date(meeting); iepDue.setDate(iepDue.getDate() + 15);
+  const daysUntil = Math.ceil((iepDue - today) / 86400000);
+  const iepViolation = today > iepDue && !recvStr;
+
+  let parentDeadline = null, parentExpired = false;
+  if (recvStr) {
+    const recv = new Date(recvStr + 'T00:00:00');
+    parentDeadline = new Date(recv); parentDeadline.setDate(parentDeadline.getDate() + 15);
+    parentExpired = today > parentDeadline;
+  }
+
+  const dueColor = iepViolation ? 'var(--red)' : (daysUntil <= 3 && !recvStr) ? 'var(--amber)' : 'var(--green)';
+
+  let html = `
+    <div class="tl-row">
+      <div style="color:var(--text3)">Meeting date</div>
+      <div style="font-weight:600">${fmtDate(meeting)}</div>
+    </div>
+    <div class="tl-row">
+      <div style="color:var(--text3)">IEP due by <span style="font-size:10px">(15 cal. days)</span></div>
+      <div style="font-weight:600;color:${dueColor}">${fmtDate(iepDue)}</div>
+    </div>`;
+
+  if (!recvStr) {
+    if (iepViolation) {
+      const overdue = Math.abs(daysUntil);
+      html += `<div class="tl-row"><div style="color:var(--red);font-weight:700">⚠ VIOLATION</div><div style="color:var(--red);font-size:11px">IEP is ${overdue} day${overdue!==1?'s':''} overdue</div></div>`;
+    } else {
+      html += `<div class="tl-row"><div style="color:var(--text3)">Days remaining</div><div style="font-weight:600;color:${daysUntil<=3?'var(--amber)':'var(--green)'}">${daysUntil} day${daysUntil!==1?'s':''}</div></div>`;
+    }
+  } else {
+    html += `
+    <div class="tl-row">
+      <div style="color:var(--text3)">Parent review deadline</div>
+      <div style="font-weight:600;color:${parentExpired?'var(--red)':'var(--green)'}">${fmtDate(parentDeadline)}</div>
+    </div>`;
+    if (parentExpired) html += `<div class="tl-row"><div style="color:var(--red);font-weight:700">⚠ EXPIRED</div><div style="color:var(--red);font-size:11px">15-day parent review window has closed</div></div>`;
+  }
+
+  html += `<div style="font-size:10px;color:var(--text3);margin-top:7px;padding-top:4px">Citation: N.J.A.C. 6A:14-3.7(e)</div>`;
+  out.innerHTML = html; out.classList.add('show');
+}
+
+/* ══ SESSION MANAGEMENT ══ */
+function newSession() {
+  if (msgs.length && !confirm('Start a new chat? Current session will be cleared (save it first if needed).')) return;
+  msgs = []; pendingTplKey = null;
+  document.getElementById('session-label').textContent = 'New session';
+  renderMsgs();
+}
+
+function saveSession() {
+  if (!msgs.length) return;
+  const first = msgs.find(m => m.role === 'user');
+  const name = first ? first.content.slice(0, 55) + (first.content.length > 55 ? '…' : '') : 'Session ' + fmtDate(new Date());
+  sessions.push({
+    id: Date.now().toString(), name,
+    date: fmtDate(new Date()),
+    messages: JSON.parse(JSON.stringify(msgs))
+  });
+  saveState();
+  const btn = document.getElementById('save-btn');
+  const orig = btn.textContent;
+  btn.textContent = 'Saved ✓'; btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+  document.getElementById('hist-btn').style.display = '';
+}
+
+function showHistory() {
+  if (!sessions.length) return;
+  const rows = sessions.slice().reverse().map(s => `
+    <div class="list-row" onclick="loadSession('${s.id}')">
+      <div style="flex:1;min-width:0">
+        <div class="list-name">${esc(s.name)}</div>
+        <div class="list-meta">${s.date} · ${s.messages.length} messages</div>
+      </div>
+      <button class="btn btn-g btn-xs" onclick="event.stopPropagation();deleteSession('${s.id}')" style="color:var(--red);flex-shrink:0">✕</button>
+    </div>`).join('');
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg'; bg.id = 'modal-bg';
+  bg.innerHTML = `<div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Session History</div>
+      <button class="btn btn-g btn-xs" onclick="closeModal()">Close</button>
+    </div>
+    <div class="modal-body">${rows}</div>
+  </div>`;
+  bg.addEventListener('click', e => { if (e.target === bg) closeModal(); });
+  document.body.appendChild(bg);
+}
+
+function closeModal() { document.getElementById('modal-bg')?.remove(); }
+
+function loadSession(id) {
+  const s = sessions.find(s => s.id === id); if (!s) return;
+  msgs = JSON.parse(JSON.stringify(s.messages));
+  document.getElementById('session-label').textContent = s.name;
+  closeModal(); renderMsgs();
+}
+
+function deleteSession(id) {
+  sessions = sessions.filter(s => s.id !== id); saveState();
+  closeModal();
+  if (sessions.length) showHistory();
+  else document.getElementById('hist-btn').style.display = 'none';
+}
+
+/* ══ DOCUMENTS ══ */
+function saveDoc(msgIdx) {
+  const m = msgs[msgIdx];
+  if (!m || m.role !== 'assistant') return;
+  const label = (m._tplLabel || 'Document') + ' — ' + fmtDate(new Date());
+  docs.push({
+    id: Date.now().toString(), label,
+    date: new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    content: m.content
+  });
+  saveState(); renderDocs();
+}
+
+function deleteDoc(id) { docs=docs.filter(d=>d.id!==id); saveState(); renderDocs(); }
+
+function printDoc(id) {
+  const doc = docs.find(d => d.id === id); if (!doc) return;
+  const w = window.open('', '_blank', 'width=840,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><title>${esc(doc.label)}</title><style>
+    body{font-family:Georgia,'Times New Roman',serif;max-width:680px;margin:48px auto;color:#111;line-height:1.8;font-size:13px}
+    h2{font-size:15px;font-weight:600;border-bottom:1px solid #ccc;padding-bottom:10px;margin-bottom:28px}
+    pre{white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.8}
+    @media print{body{margin:24px}}
+  </style></head><body>
+    <h2>${esc(doc.label)}</h2>
+    <pre>${esc(doc.content)}</pre>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+/* ══ VIOLATION LOG ══ */
+function toggleVlogForm() {
+  const f = document.getElementById('vlog-form');
+  f.classList.toggle('open');
+}
+
+function addViolation() {
+  const dist = document.getElementById('vl-dist').value.trim();
+  const type = document.getElementById('vl-type').value;
+  const notes = document.getElementById('vl-notes').value.trim();
+  const dateVal = document.getElementById('vl-date').value;
+  const status = document.getElementById('vl-status').value || 'open';
+  if (!dist && !type) { alert('Please enter a district and/or issue type.'); return; }
+  violations.push({
+    id: Date.now().toString(),
+    district: dist || 'Unknown District',
+    type: type || 'Other', notes,
+    date: dateVal ? fmtDate(new Date(dateVal+'T00:00:00')) : fmtDate(new Date()),
+    status
+  });
+  saveState();
+  ['vl-dist','vl-notes','vl-date'].forEach(id => { document.getElementById(id).value=''; });
+  document.getElementById('vl-type').value = '';
+  renderVlog();
+  document.getElementById('vlog-form').classList.remove('open');
+}
+
+function deleteViolation(id) { violations=violations.filter(v=>v.id!==id); saveState(); renderVlog(); }
+
+/* ══ BOOT ══ */
+loadState();
+renderMsgs();
+renderDocs();
+renderVlog();
+renderTemplates();
+renderReference();
+</script>
+</body>
+</html>
